@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+{% block title bien.titre %}
+{% block body %}
+<div class="jumbotron">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-8">
+	
+			</div>
+			<div class="col-md-4">
+				<h1>{{ bien.titre }}</h1>
+				<h2>{{ bien.rooms }} pièces - {{ bien.surface }} m²</h2>
+				<div class="text-primary" style="font-size: 4rem; font-weight: bold;">{{ bien.formattedPrice }} €</div>
+				<a href="#" class="btn btn-primary">Contacter l'agence</a>
+			
+
+            </div>
+		</div>
+	</div>
+</div>
+<div class="container mt-4">
+	<p>
+		{{ bien.description | nl2br }}
+	</p>
+	<div class="row">
+		<div class="col-md-8">
+			<h2>Caracteristiques</h2>
+			<table class="table table-striped">
+				<tr>
+					<td>Surface habitable</td>
+					<td>{{ bien.surface }} m²</td>
+				</tr>
+				<tr>
+					<td>Pièces</td>
+					<td>{{ bien.rooms }}</td>
+				</tr>
+				<tr>
+					<td>Chambre</td>
+					<td>{{ bien.bedrooms }}</td>
+				</tr>
+				<tr>
+					<td>Étages</td>
+					<td>{{ bien.floor }}</td>
+				</tr>
+				<tr>
+					<td>Chauffage</td>
+					<td>{{ bien.getHeatType }}</td>
+				</tr>
+			</table>
+		</div>
+		<div class="col-md-4">
+			<h2>Spécificités</h2>
+
+		</div>
+	</div>
+</div>
+{% endblock %}
