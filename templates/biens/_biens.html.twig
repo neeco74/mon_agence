@@ -1,0 +1,15 @@
+ <div class="card mb-4">
+
+
+
+
+    <div class="card-body">
+        <h5 class="card-title">
+            <a href="{{ path('biens_show', {id: bien.id, slug: bien.slug }) }}">{{ bien.titre }}</a>
+        </h5>
+        <p class="card-text">{{ bien.surface }} m² - {{ bien.city }} ({{ bien.postalCode }})</p>
+        <div class="text-primary" style="font-weight: bold; font-size: 2rem;">{{ bien.formattedPrice }} €
+        </div>
+
+    </div>
+</div>

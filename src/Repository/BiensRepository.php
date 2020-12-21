@@ -3,8 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Biens;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Entity\BiensSearch;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @method Biens|null find($id, $lockMode = null, $lockVersion = null)
@@ -21,14 +22,30 @@ class BiensRepository extends ServiceEntityRepository
 
 
 
-    public function findAllVisible() {
+     /**
+    * @return Query 
+    */
+    public function findAllVisibleQuery(BiensSearch $search)
+    {
+        $query = $this->findVisibleQuery();
 
-        return $this->createQueryBuilder('b')
-            ->where('b.sold = false')
-            ->getQuery()
-            ->getResult();
+            if ($search->getMaxPrice()) {
+                $query = $query->andWhere('p.price <= :maxprice');
+                $query = $query->setParameter('maxprice', $search->getMaxPrice());
 
+            }
 
+            if ($search->getMinSurface()) {
+                $query = $query->andWhere('p.surface >= :minsurface');
+                $query = $query->setParameter('minsurface', $search->getMinSurface());
+
+            }
+
+    
+
+            return $query->getQuery();
+
+   
     }
 
  

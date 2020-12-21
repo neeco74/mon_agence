@@ -3,8 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\Biens;
+use App\Entity\BiensSearch;
+use App\Form\BiensSearchType;
 use App\Repository\BiensRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -33,7 +37,7 @@ class BiensController extends AbstractController
      * @Route("/biens", name="biens_index")
      * @return Response
      */
-    public function index(): Response
+    public function index(PaginatorInterface $paginator, Request $request): Response 
     {
         // $bien = new Biens();
         // $bien->setTitre('Mon premier bien')
@@ -52,11 +56,22 @@ class BiensController extends AbstractController
         // $em->persist($bien);
         // $em->flush(); 
 
-        $bien = $this->repository->findAllVisible();
-        dump($bien);
+
+        $search = new BiensSearch();
+        dump($search);
+        $form = $this->createForm(BiensSearchType::class, $search);
+        $form->handleRequest($request);
+
+        $biens = $paginator->paginate(
+            $this->repository->findAllVisibleQuery($search),
+            $request->query->getInt('page', 1), /*page number*/
+            12
+        );
 
         return $this->render('biens/index.html.twig', [
-            'current_menu' => 'biens'
+            'current_menu' => 'biens',
+            'biens' => $biens,
+            'form' => $form->createView()
         ]);
 
     }

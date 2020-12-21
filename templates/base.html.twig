@@ -25,14 +25,14 @@
                 <ul class="navbar-nav">
 
                     <li class="nav-item">
-                        <a href="" class="nav-link">Connexion</a>
+                        <a href="{{ path('login') }}" class="nav-link">Connexion</a>
                     </li>
                 </ul>
                 {% if app.user %}
                 <ul class="navbar-nav">
 
                     <li class="nav-item">
-                        <a href="" class="nav-link">Deconnexion</a>
+                        <a href="{{ path('logout') }}" class="nav-link">Deconnexion</a>
                     </li>
                 </ul>
                 {% endif %}
