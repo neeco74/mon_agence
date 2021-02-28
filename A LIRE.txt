@@ -1,0 +1,8 @@
+VERSION 3.2
+
+C'est à dire que c'est la trosieme version (3eme essai) de grafikart tuto.
+
+La v3.2 indique qu'il y a une branche du premier dossier v3.1 ,au niveau de la sécurité : video 6/16 : en effet: prise de la v3.1, puis branche afin d'installer un user, 
+make:user, 
+make:auth,
+make:registration

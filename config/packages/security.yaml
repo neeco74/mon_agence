@@ -10,7 +10,7 @@ security:
         from_database:
           entity:
             class: App\Entity\User
-            property: username
+            property: email
 
 
     firewalls:
@@ -24,11 +24,17 @@ security:
 
 
             form_login: 
-                check_path: login
+              login_path: login
+              check_path: login
+              username_parameter: email
+              password_parameter: password
 
             logout: 
                 path: /logout
                 target: /
+            guard:
+                authenticators:
+                    - App\Security\LoginAuthenticator
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#firewalls-authentication
@@ -47,5 +53,5 @@ security:
       # Symfony\Component\Security\Core\User\User: plaintext
        # App\Entity\User: plaintext
       App\Entity\User: 
-        algorithm: bcrypt
-        cost: 12
+        algorithm: auto
+       
