@@ -76,14 +76,16 @@ class AdminBiensController extends AbstractController {
     * @param PropertyRepository $repository
     * @return Response
     */
-   public function edit(Biens $bien, Request $request) {
+   public function edit(Biens $bien, Request $request, CacheManager $cacheManager, UploaderHelper $helper) {
 
         $form = $this->createForm(BiensType::class, $bien);
         $form->handleRequest($request);
 
         
         if($form->isSubmitted() && $form->isValid()) {
-            
+            if($bien->getImageFile() instanceof UploadedFile) {
+                $cacheManager->remove($helper->asset($bien, 'imageFile'));
+            }
 
 
             $this->em->flush();

@@ -1,4 +1,13 @@
  <div class="card mb-4">
+    {% if bien.filename %}
+        
+        <img src="{{ vich_uploader_asset(bien, 'imageFile') | imagine_filter('thumb') }}" alt="card-img-top" style="width: 100%; height: auto;">
+    
+    {% else %}
+
+        <img src="{{ '/images/biens/empty.jpg' | imagine_filter('thumb') }}" alt="card-img-top">  
+    
+    {% endif %}
 
 
 
