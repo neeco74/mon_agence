@@ -10,6 +10,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 class BiensType extends AbstractType
 {
@@ -32,12 +33,17 @@ class BiensType extends AbstractType
                 'choice_label' => 'name',
                 'multiple' => true
             ])
-            ->add('imageFile', FileType::class, [
+            ->add('images', FileType::class, [
+                'label' => false,
+                'multiple' => true,
+                'mapped' => false,
                 'required' => false
             ])
             ->add('city')
             ->add('address')
             ->add('postal_code')
+            ->add('lat', HiddenType::class)
+            ->add('lng', HiddenType::class)
             ->add('sold')
             
         ;

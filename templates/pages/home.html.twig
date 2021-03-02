@@ -16,17 +16,7 @@
         <div class="row flex">
             {% for bien in biensLatest %}
                 <div class="col-3">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <a href="{{ path('biens_show', {id: bien.id, slug: bien.slug }) }}">{{ bien.titre }}</a>
-                            </h5>
-                            <p class="card-text">{{ bien.city }} ({{ bien.postalCode }})</p>
-                            <div class="text-primary" style="font-weight: bold; font-size: 2rem;">{{ bien.formattedPrice }} €
-                            </div>
-
-                        </div>
-                    </div>
+                    {% include 'biens/_biens.html.twig' %}
                 </div>
             {% endfor %}
         </div>

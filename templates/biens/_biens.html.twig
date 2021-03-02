@@ -1,24 +1,32 @@
- <div class="card mb-4">
-    {% if bien.filename %}
-        
-        <img src="{{ vich_uploader_asset(bien, 'imageFile') | imagine_filter('thumb') }}" alt="card-img-top" style="width: 100%; height: auto;">
-    
-    {% else %}
+{% cache 'bien'~bien.id bien.updatedAt.timestamp|default(date('2018-01-01 00:00:00').timestamp) %} 
 
-        <img src="{{ '/images/biens/empty.jpg' | imagine_filter('thumb') }}" alt="card-img-top">  
-    
-    {% endif %}
+<div class="card mb-4">
+	{% if bien.images|length > 0 %}
+		
+		{% for image in bien.images %}
+			{% if loop.first %}
+				<img src="{{ asset('/uploads/'~image.name) | imagine_filter('thumb') }}" alt="card-img-top" style="width: 100%; height: auto;">
+			{% endif %}
+		{% endfor %}
+	{% else %}
+
+		<img src="{{ asset('/uploads/empty.jpg') | imagine_filter('thumb') }}" alt="card-img-top">
+
+	{% endif %}
 
 
+	<div class="card-body">
+		<h5 class="card-title">
+			<a href="{{ path('biens_show', {id: bien.id, slug: bien.slug }) }}">{{ bien.titre }}</a>
+		</h5>
+		<p class="card-text">{{ bien.surface }}
+			m² -
+			{{ bien.city }}
+			({{ bien.postalCode }})</p>
+		<div class="text-primary" style="font-weight: bold; font-size: 2rem;">{{ bien.formattedPrice }}
+			€
+		</div>
 
-
-    <div class="card-body">
-        <h5 class="card-title">
-            <a href="{{ path('biens_show', {id: bien.id, slug: bien.slug }) }}">{{ bien.titre }}</a>
-        </h5>
-        <p class="card-text">{{ bien.surface }} m² - {{ bien.city }} ({{ bien.postalCode }})</p>
-        <div class="text-primary" style="font-weight: bold; font-size: 2rem;">{{ bien.formattedPrice }} €
-        </div>
-
-    </div>
+	</div>
 </div>
+{% endcache %}

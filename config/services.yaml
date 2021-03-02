@@ -4,6 +4,8 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
+      images_directory: '%kernel.project_dir%/public/uploads'
+
 
 services:
     # default configuration for services in *this* file
@@ -34,3 +36,18 @@ services:
     App\Listener\ImageCacheSubscriber:
         tags:
         - { name: doctrine.event_subscriber }
+
+
+    Twig\CacheExtension\CacheProviderInterface: 
+        class: Twig\CacheExtension\CacheProvider\PsrCacheAdapter
+
+
+    Twig\CacheExtension\CacheStrategyInterface: 
+        class: Twig\CacheExtension\CacheStrategy\LifetimeCacheStrategy
+
+
+
+
+    Twig\CacheExtension\Extension: 
+        tags:
+        - { name: twig.extension }

@@ -5,16 +5,18 @@ namespace App\Controller\Admin;
 
 use App\Entity\Biens;
 
+use App\Entity\Images;
 use App\Form\BiensType;
 use App\Repository\BiensRepository;
-use Doctrine\ORM\EntityManagerInterface;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+
+
 use Symfony\Component\Routing\Annotation\Route;
-
-
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -58,6 +60,27 @@ class AdminBiensController extends AbstractController {
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()) {
+                        // On recupere les images transmises
+                        $images = $form->get('images')->getData();
+
+                        // On boucle sur les images
+                        foreach ($images as $image) {
+                            //On genere un nouveau nom de fichier
+                            $fichier = md5(uniqid()) . '.' . $image->guessExtension();
+            
+                            //On copie le fichier dans le dossier uploads
+                            $image->move(
+                                $this->getParameter('images_directory'),      // Va recuperer la variable du services.yaml
+                                $fichier
+                            );
+            
+                            // On stocke l'image dans la bdd (son nom)
+                            $img = new Images();
+                            $img->setName($fichier);
+                            $bien->addImage($img);
+                        }
+
+                        
             $this->em->persist($bien);
             $this->em->flush();
             $this->addFlash('success', 'Bien créé avec succès');
@@ -83,9 +106,28 @@ class AdminBiensController extends AbstractController {
 
         
         if($form->isSubmitted() && $form->isValid()) {
-            if($bien->getImageFile() instanceof UploadedFile) {
-                $cacheManager->remove($helper->asset($bien, 'imageFile'));
+            // On recupere les images transmises
+            $images = $form->get('images')->getData();
+
+            // On boucle sur les images
+            foreach ($images as $image) {
+                //On genere un nouveau nom de fichier
+                $fichier = md5(uniqid()) . '.' . $image->guessExtension();
+
+                //On copie le fichier dans le dossier uploads
+                $image->move(
+                    $this->getParameter('images_directory'),      // Va recuperer la variable du services.yaml
+                    $fichier
+                );
+
+                // On stocke l'image dans la bdd (son nom)
+                $img = new Images();
+                $img->setName($fichier);
+                $bien->addImage($img);
             }
+
+
+
 
 
             $this->em->flush();
@@ -120,6 +162,30 @@ class AdminBiensController extends AbstractController {
             
         }
         return $this->redirectToRoute('admin_property_index');
+    }
+
+    /**
+     * @Route("/admin/image/delete/{id}", name="admin_delete_image", methods={"DELETE"})
+     */
+    public function deleteImage(Images $image, Request $request) {
+        $data = json_decode($request->getContent(), true);
+        
+        if($this->isCsrfTokenValid('delete' . $image->getId(), $data['_token'])){
+            $nom = $image->getName();
+            unlink($this->getParameter('images_directory').'/'.$nom);
+            
+            // On supprime l'entrée de la base
+            $em = $this->getDoctrine()->getManager();
+            $em->remove($image);
+            $em->flush();
+            
+            // On répond en json
+            return new JsonResponse(['success' => 1]);
+        }
+        else {
+            return new JsonResponse(['error' => 'Token Invalide'], 400);
+        }
+
     }
 
 }

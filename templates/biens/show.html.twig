@@ -1,66 +1,131 @@
 {% extends 'base.html.twig' %}
 {% block title bien.titre %}
 {% block body %}
-<div class="jumbotron">
-	<div class="container">
+	<div class="jumbotron">
+		<div class="container">
+			{% for message in app.flashes('success') %}
+				<div class="alert alert-success">
+                
+				    {{ message }}
+		        </div>
+		    {% endfor %}
+
+            {% if not form.vars.valid %}
+                <div class="alert alert-danger">
+                    Erreur je ne sais pas quoi
+                </div>
+            {% endif %}
+
+
+			<div class="row">
+				<div class="col-md-8">
+                    {% if bien.images|length > 0 %}
+                        
+                        {% for image in bien.images %}
+                            {% if loop.first %}
+                                <img src="{{ asset('/uploads/'~image.name) | imagine_filter('medium') }}" alt="card-img-top" style="width: 100%; height: auto;">
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+
+                        <img src="{{ asset('/uploads/empty.jpg') | imagine_filter('medium') }}" alt="card-img-top">
+
+                    {% endif %}
+				</div>
+				<div class="col-md-4">
+					<h1>{{ bien.titre }}</h1>
+					<h2>{{ bien.rooms }}
+						pièces -
+						{{ bien.surface }}
+						m²</h2>
+					<div class="text-primary" style="font-size: 4rem; font-weight: bold;">{{ bien.formattedPrice }}
+						€</div>
+					<a href="#" class="btn btn-primary" id="contactButton" {% if form.vars.submitted %} style="display:none;" {% endif %}>Contacter l'agence</a>
+
+					<div id="contactForm" class="mt-4" {% if not form.vars.submitted %} style="display:none;" {% endif %}>
+						{{ form_start(form) }}
+						<div class="row">
+							<div class="col">{{ form_row(form.firstname) }}</div>
+							<div class="col">{{ form_row(form.lastname) }}</div>
+						</div>
+						<div class="row">
+							<div class="col">{{ form_row(form.phone) }}</div>
+							<div class="col">{{ form_row(form.email) }}</div>
+						</div>
+						{{ form_rest(form) }}
+						<div class="form-group">
+							<button class="btn btn-primary">Envoyer</button>
+						</div>
+						{{ form_end(form) }}
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="container mt-4">
+		<p>
+			{{ bien.description | nl2br }}
+		</p>
 		<div class="row">
 			<div class="col-md-8">
-					{% if bien.filename %}
-					<img src="{{ vich_uploader_asset(bien, 'imageFile') | imagine_filter('medium') }}" alt="card-img-top">
-				{% else %}
-					<img src="{{ '/images/biens/empty.jpg' | imagine_filter('medium') }}" alt="card-img-top">
-				{% endif %}
+				<h2>Caracteristiques</h2>
+				<table class="table table-striped">
+					<tr>
+						<td>Surface habitable</td>
+						<td>{{ bien.surface }}
+							m²</td>
+					</tr>
+					<tr>
+						<td>Pièces</td>
+						<td>{{ bien.rooms }}</td>
+					</tr>
+					<tr>
+						<td>Chambre</td>
+						<td>{{ bien.bedrooms }}</td>
+					</tr>
+					<tr>
+						<td>Étages</td>
+						<td>{{ bien.floor }}</td>
+					</tr>
+					<tr>
+						<td>Chauffage</td>
+						<td>{{ bien.getHeatType }}</td>
+					</tr>
+				</table>
 			</div>
 			<div class="col-md-4">
-				<h1>{{ bien.titre }}</h1>
-				<h2>{{ bien.rooms }} pièces - {{ bien.surface }} m²</h2>
-				<div class="text-primary" style="font-size: 4rem; font-weight: bold;">{{ bien.formattedPrice }} €</div>
-				<a href="#" class="btn btn-primary">Contacter l'agence</a>
-			
+				<h2>Spécificités</h2>
+				<ul class="list-group">
+					{% for option in bien.options %}
+						<li class="list-group-item">{{ option.name }}</li>
+					{% endfor %}
+				</ul>
 
-            </div>
+			</div>
 		</div>
+        <div id="map" style="width: 100%; height: 600px; margin-bottom:100px;" data-lat="{{ bien.lat }}" data-lng="{{ bien.lng }}"></div>
 	</div>
-</div>
-<div class="container mt-4">
-	<p>
-		{{ bien.description | nl2br }}
-	</p>
-	<div class="row">
-		<div class="col-md-8">
-			<h2>Caracteristiques</h2>
-			<table class="table table-striped">
-				<tr>
-					<td>Surface habitable</td>
-					<td>{{ bien.surface }} m²</td>
-				</tr>
-				<tr>
-					<td>Pièces</td>
-					<td>{{ bien.rooms }}</td>
-				</tr>
-				<tr>
-					<td>Chambre</td>
-					<td>{{ bien.bedrooms }}</td>
-				</tr>
-				<tr>
-					<td>Étages</td>
-					<td>{{ bien.floor }}</td>
-				</tr>
-				<tr>
-					<td>Chauffage</td>
-					<td>{{ bien.getHeatType }}</td>
-				</tr>
-			</table>
-		</div>
-		<div class="col-md-4">
-			<h2>Spécificités</h2>
-			<ul class="list-group">
-				{% for option in bien.options %}
-					<li class="list-group-item">{{ option.name }}</li>
-				{% endfor %}
-			</ul>
+{% endblock %}
+{% block javascripts %}
+		<script>
+        {% if bien.lat != 0 and bien.lng != 0 %}
+			let villeLat = {{ bien.lat }}
+            let villeLng = {{ bien.lng }}
+        {% else %}
+			let villeLat = 48.852969
+            let villeLng = 2.349903
+        {% endif %}
+        
+            let villes = {
+                "{{ bien.city }}": { "lat": villeLat, "lon": villeLng },
 
-		</div>
-	</div>
-</div>
+            };
+
+
+
+		</script>
+
+
+
 {% endblock %}

@@ -35,7 +35,7 @@ class Biens
 
     /**
      * @var string|null
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $filename;
 
@@ -124,15 +124,31 @@ class Biens
     private $options;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", nullable=true)
      */
     private $updated_at;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Images::class, mappedBy="biens", orphanRemoval=true, cascade={"persist"})
+     */
+    private $images;
+
+    /**
+     * @ORM\Column(type="float", scale=4, precision=6)
+     */
+    private $lat;
+
+    /**
+     * @ORM\Column(type="float", scale=4, precision=7)
+     */
+    private $lng;
 
 
     public function __construct()
     {
         $this->created_at = new \DateTime();
         $this->options = new ArrayCollection();
+        $this->images = new ArrayCollection();
 
     }
 
@@ -402,6 +418,60 @@ class Biens
     public function setUpdatedAt(\DateTimeInterface $updated_at): self
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Images[]
+     */
+    public function getImages(): Collection
+    {
+        return $this->images;
+    }
+
+    public function addImage(Images $image): self
+    {
+        if (!$this->images->contains($image)) {
+            $this->images[] = $image;
+            $image->setBiens($this);
+        }
+
+        return $this;
+    }
+
+    public function removeImage(Images $image): self
+    {
+        if ($this->images->removeElement($image)) {
+            // set the owning side to null (unless already changed)
+            if ($image->getBiens() === $this) {
+                $image->setBiens(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getLat(): ?float
+    {
+        return $this->lat;
+    }
+
+    public function setLat(float $lat): self
+    {
+        $this->lat = $lat;
+
+        return $this;
+    }
+
+    public function getLng(): ?float
+    {
+        return $this->lng;
+    }
+
+    public function setLng(float $lng): self
+    {
+        $this->lng = $lng;
 
         return $this;
     }

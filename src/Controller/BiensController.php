@@ -3,10 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\Biens;
+use App\Entity\Contact;
+use App\Form\ContactType;
 use App\Entity\BiensSearch;
 use App\Form\BiensSearchType;
 use App\Repository\BiensRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Notification\ContactNotification;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -81,7 +84,8 @@ class BiensController extends AbstractController
      * @Route("/biens/{slug}-{id}", name="biens_show", requirements={"slug": "[a-z0-9\-]*"})
      * @return Response
      */
-    public function show(Biens $bien, string $slug): Response {
+    public function show(Biens $bien, string $slug, Request $request, ContactNotification $notification): Response {
+
 
 
         if($bien->getSlug() !== $slug){
@@ -92,15 +96,31 @@ class BiensController extends AbstractController
             ], 301);
         }
 
+        
+        $contact = new Contact();
+        $contact->setBiens($bien);
+        $form = $this->createForm(ContactType::class, $contact);
+        $form->handleRequest($request);
+
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $notification->notify($contact);
+            $this->addFlash('success', 'Votre email a bien été envoyé');
+            
+            return $this->redirectToRoute('biens_show', [
+                'id'   => $bien->getId(),
+                'slug' => $bien->getSlug()
+            ]);
+        }
+
 
         return $this->render('biens/show.html.twig', [
             'bien' => $bien,
-            'current_menu' => 'biens'
-            
+            'current_menu' => 'biens',
+            'form' => $form->createView()
         ]);
         
     } 
-
 
 
 
